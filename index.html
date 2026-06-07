@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusShop — Reseller Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pp1: #c084fc;
+  --pp2: #a855f7;
+  --pp3: #9333ea;
+  --pp4: #7c3aed;
+  --pk1: #f0abfc;
+  --pk2: #e879f9;
+  --pk3: #d946ef;
+  --bg: #0d0a14;
+  --bg2: #130e1e;
+  --bg3: #1a1228;
+  --bg4: #221832;
+  --card: #1c1330;
+  --border: rgba(192,132,252,0.15);
+  --border2: rgba(192,132,252,0.25);
+  --text: #f3e8ff;
+  --muted: #a78bca;
+  --muted2: #6b4f8a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+
+/* ===== UTILITIES ===== */
+.hidden { display: none !important; }
+.page { min-height: 100vh; }
+
+/* ===== GLOW BG ===== */
+.glow-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(168,85,247,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 50% at 80% 80%, rgba(217,70,239,0.08) 0%, transparent 60%);
+}
+
+/* ===== AUTH PAGES ===== */
+#auth-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 2rem; position: relative;
+}
+.auth-box {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px;
+  position: relative; z-index: 1;
+  box-shadow: 0 0 60px rgba(168,85,247,0.1), 0 0 120px rgba(168,85,247,0.04);
+}
+.auth-logo {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;
+  justify-content: center;
+}
+.auth-logo-icon {
+  width: 44px; height: 44px; background: linear-gradient(135deg, var(--pp2), var(--pk3));
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+}
+.auth-logo-icon svg { width: 24px; height: 24px; fill: white; }
+.auth-logo-text { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
+.auth-logo-text span { background: linear-gradient(90deg, var(--pp1), var(--pk2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.auth-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+.auth-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.75rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 0.4rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.form-group input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.75rem 1rem; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus { outline: none; border-color: var(--pp2); box-shadow: 0 0 0 3px rgba(168,85,247,0.15); }
+.form-group input::placeholder { color: var(--muted2); }
+.btn-primary {
+  width: 100%; padding: 0.85rem; background: linear-gradient(135deg, var(--pp3), var(--pk3));
+  border: none; border-radius: 10px; color: white; font-family: 'Syne', sans-serif;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.15s; margin-top: 0.5rem;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.auth-switch { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: var(--muted); }
+.auth-switch a { color: var(--pp1); text-decoration: none; font-weight: 500; cursor: pointer; }
+.auth-switch a:hover { text-decoration: underline; }
+
+/* Success / Error message */
+.msg { padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1rem; text-align: center; }
+.msg.success { background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.3); color: var(--pp1); }
+.msg.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+
+/* Pending screen */
+#pending-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 2rem; position: relative;
+}
+.pending-box {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 3rem 2.5rem; width: 100%; max-width: 420px;
+  position: relative; z-index: 1; text-align: center;
+}
+.pending-icon {
+  width: 72px; height: 72px; background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(217,70,239,0.2));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem; border: 1px solid var(--border2);
+}
+.pending-icon svg { width: 36px; height: 36px; }
+.pending-box h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+.pending-box p { color: var(--muted); line-height: 1.6; font-size: 0.9rem; }
+.badge-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
+  color: #fde68a; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem;
+  font-weight: 500; margin: 1.25rem auto; letter-spacing: 0.05em;
+}
+.badge-status::before { content: ''; width: 7px; height: 7px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ===== DASHBOARD LAYOUT ===== */
+#dashboard-page { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px; background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 1.5rem 1rem;
+  position: fixed; top: 0; left: 0; height: 100vh; z-index: 10;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px; padding: 0 0.5rem; margin-bottom: 2rem;
+}
+.sidebar-logo-icon {
+  width: 36px; height: 36px; background: linear-gradient(135deg, var(--pp2), var(--pk3));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-logo-icon svg { width: 20px; height: 20px; fill: white; }
+.sidebar-logo-text { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; }
+.sidebar-logo-text span { background: linear-gradient(90deg, var(--pp1), var(--pk2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.nav-section { font-size: 0.7rem; font-weight: 600; color: var(--muted2); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; margin-bottom: 0.35rem; margin-top: 0.75rem; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 0.65rem 0.75rem;
+  border-radius: 10px; cursor: pointer; transition: all 0.15s;
+  color: var(--muted); font-size: 0.9rem; font-weight: 400;
+  border: 1px solid transparent;
+}
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-item:hover { background: rgba(192,132,252,0.08); color: var(--pp1); }
+.nav-item.active {
+  background: rgba(192,132,252,0.12); color: var(--pp1);
+  border-color: var(--border);
+}
+.sidebar-bottom { margin-top: auto; }
+.user-pill {
+  display: flex; align-items: center; gap: 10px; padding: 0.75rem;
+  background: var(--bg3); border-radius: 12px; border: 1px solid var(--border);
+}
+.user-avatar {
+  width: 32px; height: 32px; background: linear-gradient(135deg, var(--pp3), var(--pk3));
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; overflow: hidden; }
+.user-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 0.7rem; color: var(--muted); }
+.logout-btn {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  padding: 4px; border-radius: 6px; transition: color 0.15s;
+}
+.logout-btn:hover { color: #fca5a5; }
+.logout-btn svg { width: 16px; height: 16px; display: block; }
+
+/* MAIN CONTENT */
+.main { margin-left: 240px; flex: 1; padding: 2rem 2.5rem; position: relative; z-index: 1; }
+
+/* TOPBAR */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+.topbar-left h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.1rem; }
+.topbar-left p { color: var(--muted); font-size: 0.875rem; }
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+.topbar-badge {
+  display: flex; align-items: center; gap: 7px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+.topbar-badge svg { width: 16px; height: 16px; color: var(--pp1); }
+
+/* STAT CARDS */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.25rem 1.5rem; position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: ''; position: absolute; top: -20px; right: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,132,252,0.12), transparent 70%);
+}
+.stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
+.stat-label svg { width: 14px; height: 14px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 700; }
+.stat-value.green { color: #86efac; }
+.stat-value.purple { background: linear-gradient(90deg, var(--pp1), var(--pk2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-change { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+.stat-change .up { color: #86efac; }
+.stat-change .down { color: #fca5a5; }
+
+/* SECTION */
+.section-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.section-title svg { width: 18px; height: 18px; color: var(--pp2); }
+
+/* PRODUCT CARDS */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.product-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.25rem; transition: border-color 0.2s, transform 0.15s;
+}
+.product-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.product-icon {
+  width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.85rem;
+}
+.product-icon svg { width: 24px; height: 24px; }
+.product-name { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+.product-cat { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.75rem; }
+.product-footer { display: flex; align-items: center; justify-content: space-between; }
+.product-price { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--pp1); }
+.product-orders { font-size: 0.75rem; color: var(--muted); }
+
+/* KEYS PAGE */
+.keys-table { width: 100%; border-collapse: collapse; }
+.keys-table th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+.keys-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+.keys-table tr:last-child td { border-bottom: none; }
+.key-mono { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--pp1); background: rgba(192,132,252,0.08); padding: 3px 8px; border-radius: 6px; }
+.status-pill { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em; }
+.status-pill.active { background: rgba(134,239,172,0.1); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
+.status-pill.expired { background: rgba(252,165,165,0.1); color: #fca5a5; border: 1px solid rgba(252,165,165,0.2); }
+.table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+/* ORDERS PAGE */
+.order-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+.order-row:last-child { border-bottom: none; }
+.order-id { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--muted); min-width: 90px; }
+.order-product { flex: 1; font-size: 0.875rem; }
+.order-amount { font-family: 'Syne', sans-serif; font-weight: 600; color: var(--pp1); min-width: 70px; text-align: right; }
+.order-date { font-size: 0.75rem; color: var(--muted); min-width: 90px; text-align: right; }
+
+/* SETTINGS PAGE */
+.settings-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; }
+.settings-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; }
+.settings-row label { font-size: 0.875rem; color: var(--muted); }
+.settings-input {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.5rem 0.85rem; color: var(--text); font-size: 0.875rem;
+  font-family: 'DM Sans', sans-serif; width: 220px;
+}
+.settings-input:focus { outline: none; border-color: var(--pp2); }
+.btn-sm {
+  padding: 0.45rem 1rem; background: linear-gradient(135deg, var(--pp3), var(--pk3));
+  border: none; border-radius: 8px; color: white; font-size: 0.8rem;
+  font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.btn-sm:hover { opacity: 0.85; }
+
+/* API KEYS PAGE */
+.api-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+.api-key-display {
+  display: flex; align-items: center; gap: 0.75rem; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; margin: 1rem 0;
+}
+.api-key-val { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--pp1); flex: 1; word-break: break-all; }
+.copy-btn {
+  background: rgba(192,132,252,0.1); border: 1px solid var(--border);
+  border-radius: 7px; padding: 5px 10px; color: var(--pp1); cursor: pointer;
+  font-size: 0.75rem; white-space: nowrap; display: flex; align-items: center; gap: 5px;
+}
+.copy-btn:hover { background: rgba(192,132,252,0.2); }
+.copy-btn svg { width: 14px; height: 14px; }
+.api-limit-bar { background: var(--bg3); height: 6px; border-radius: 3px; margin-top: 0.5rem; overflow: hidden; }
+.api-limit-fill { height: 100%; background: linear-gradient(90deg, var(--pp3), var(--pk3)); border-radius: 3px; }
+
+/* PRODUCTS STORE */
+.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.store-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.5rem; transition: all 0.2s;
+}
+.store-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: 0 10px 40px rgba(168,85,247,0.12); }
+.store-price { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; background: linear-gradient(90deg, var(--pp1), var(--pk2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.store-desc { font-size: 0.875rem; color: var(--muted); margin: 0.5rem 0 1rem; line-height: 1.5; }
+.store-features { list-style: none; margin-bottom: 1.25rem; }
+.store-features li { font-size: 0.825rem; color: var(--muted); display: flex; align-items: center; gap: 7px; margin-bottom: 0.4rem; }
+.store-features li svg { width: 14px; height: 14px; color: var(--pp2); flex-shrink: 0; }
+.buy-btn {
+  width: 100%; padding: 0.75rem; background: linear-gradient(135deg, var(--pp3), var(--pk3));
+  border: none; border-radius: 10px; color: white; font-family: 'Syne', sans-serif;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+}
+.buy-btn:hover { opacity: 0.85; }
+
+/* ===== ADMIN PAGE ===== */
+#admin-page { min-height: 100vh; display: flex; }
+.admin-sidebar {
+  width: 220px; background: #0a0a0f; border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 1.5rem 0.75rem; position: fixed; top: 0; left: 0; height: 100vh;
+}
+.admin-label {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.25); padding: 0.4rem 0.75rem; margin-top: 0.75rem;
+}
+.admin-nav-item {
+  display: flex; align-items: center; gap: 9px; padding: 0.6rem 0.75rem;
+  border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.45);
+  font-size: 0.85rem; transition: all 0.15s;
+}
+.admin-nav-item svg { width: 16px; height: 16px; }
+.admin-nav-item:hover, .admin-nav-item.active { background: rgba(192,132,252,0.1); color: var(--pp1); }
+.admin-main { margin-left: 220px; flex: 1; padding: 2rem 2.5rem; }
+.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+.admin-header h1 { font-size: 1.4rem; font-weight: 700; }
+.admin-tag { background: rgba(192,132,252,0.12); border: 1px solid var(--border); color: var(--pp1); font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+.admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.admin-stat { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+.admin-stat-val { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--pp1); }
+.admin-stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+.admin-table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { background: var(--bg3); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0.85rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border); }
+.admin-table td { padding: 0.9rem 1.25rem; font-size: 0.875rem; border-bottom: 1px solid var(--border); }
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: rgba(192,132,252,0.03); }
+.action-btn {
+  padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;
+  border: none; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+}
+.action-btn.approve { background: rgba(134,239,172,0.12); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
+.action-btn.approve:hover { background: rgba(134,239,172,0.2); }
+.action-btn.reject { background: rgba(252,165,165,0.1); color: #fca5a5; border: 1px solid rgba(252,165,165,0.2); }
+.action-btn.reject:hover { background: rgba(252,165,165,0.2); }
+.action-btn.view { background: rgba(192,132,252,0.1); color: var(--pp1); border: 1px solid var(--border); }
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--card);
+  border: 1px solid var(--border2); border-radius: 12px; padding: 0.85rem 1.25rem;
+  display: flex; align-items: center; gap: 10px; font-size: 0.875rem; z-index: 1000;
+  animation: slideIn 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+.toast svg { width: 18px; height: 18px; color: var(--pp1); }
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ===== PRODUCT TABS ===== */
+.sub-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.sub-tab {
+  padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+  border: 1px solid var(--border); color: var(--muted); background: transparent;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+}
+.sub-tab.active { background: rgba(192,132,252,0.12); color: var(--pp1); border-color: var(--border2); }
+
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+/* Discord webhook note */
+.webhook-note { background: rgba(88,101,242,0.08); border: 1px solid rgba(88,101,242,0.2); border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.825rem; color: #a5b4fc; display: flex; align-items: flex-start; gap: 8px; margin-top: 1rem; }
+.webhook-note svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+
+/* Notification dot */
+.notif-dot { width: 7px; height: 7px; background: var(--pk2); border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="glow-bg"></div>
+
+<!-- ===== AUTH PAGE ===== -->
+<div id="auth-page" class="page">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="auth-logo-text">Nexus<span>Shop</span></div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to your reseller account</p>
+      <div id="login-msg"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="your_username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <p class="auth-switch">Don't have an account? <a onclick="showRegister()">Register here</a></p>
+      <p class="auth-switch" style="margin-top:0.5rem"><a onclick="showAdminLogin()">Admin access →</a></p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" class="hidden">
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Apply for a reseller account today</p>
+      <div id="reg-msg"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reg-user" placeholder="your_username">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Discord Tag</label>
+        <input type="text" id="reg-discord" placeholder="user#1234">
+      </div>
+      <button class="btn-primary" onclick="handleRegister()">Submit Application</button>
+      <p class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></p>
+    </div>
+
+    <!-- ADMIN LOGIN FORM -->
+    <div id="admin-login-form" class="hidden">
+      <h2 class="auth-title">Admin Access</h2>
+      <p class="auth-sub">Restricted area — authorized personnel only</p>
+      <div id="admin-login-msg"></div>
+      <div class="form-group">
+        <label>Admin Username</label>
+        <input type="text" id="admin-user" placeholder="username">
+      </div>
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" id="admin-pass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="handleAdminLogin()">Access Admin Panel</button>
+      <p class="auth-switch"><a onclick="showLogin()">← Back to login</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PENDING PAGE ===== -->
+<div id="pending-page" class="page hidden">
+  <div class="pending-box">
+    <div class="pending-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="url(#pg)" stroke-width="1.5">
+        <defs><linearGradient id="pg" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#c084fc"/><stop offset="1" stop-color="#e879f9"/></linearGradient></defs>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+      </svg>
+    </div>
+    <h2>Application Sent!</h2>
+    <div class="badge-status">Pending Review</div>
+    <p>Your application has been submitted to the higher ups. You'll be notified once it's been reviewed. This usually takes 24–48 hours.</p>
+    <p style="margin-top:1rem; font-size:0.8rem; color:var(--muted2);">Application sent to our team via Discord.</p>
+    <button class="btn-primary" style="margin-top:1.5rem" onclick="showLogin()">Back to Login</button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD PAGE ===== -->
+<div id="dashboard-page" class="page hidden">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="sidebar-logo-text">Nexus<span>Shop</span></div>
+    </div>
+
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showSection('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('keys')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+      Keys
+    </div>
+    <div class="nav-item" onclick="showSection('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+      Orders
+    </div>
+    <div class="nav-item" onclick="showSection('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+      Products
+    </div>
+    <div class="nav-item" onclick="showSection('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Settings
+    </div>
+    <div class="nav-item" onclick="showSection('apikeys')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+      API Keys
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar" id="sidebar-avatar">U</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-username">User</div>
+          <div class="user-role">Reseller</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- HOME SECTION -->
+    <div id="section-home">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h1 id="welcome-msg">Welcome Back, User</h1>
+          <p id="welcome-date">Loading...</p>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span id="topbar-time">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18-3a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6"/></svg>
+            Account Balance
+          </div>
+          <div class="stat-value purple" id="stat-balance">$0.00</div>
+          <div class="stat-change"><span class="up">↑ Active</span> reseller account</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            Spent This Week
+          </div>
+          <div class="stat-value" id="stat-spent">$0.00</div>
+          <div class="stat-change"><span class="down">↓ 12%</span> vs last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+            Orders This Week
+          </div>
+          <div class="stat-value green" id="stat-orders">0</div>
+          <div class="stat-change"><span class="up">↑ 8%</span> vs last week</div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+        Top Products Purchased
+      </div>
+
+      <div class="products-grid" id="top-products-grid"></div>
+    </div>
+
+    <!-- KEYS SECTION -->
+    <div id="section-keys" class="hidden">
+      <div class="topbar">
+        <div class="topbar-left"><h1>License Keys</h1><p>Your purchased keys and subscriptions</p></div>
+      </div>
+      <div class="table-wrap">
+        <table class="keys-table">
+          <thead><tr><th>Product</th><th>Key</th><th>Expires</th><th>Status</th></tr></thead>
+          <tbody id="keys-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS SECTION -->
+    <div id="section-orders" class="hidden">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Order History</h1><p>All your past purchases</p></div>
+      </div>
+      <div class="table-wrap">
+        <div id="orders-list"></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS SECTION -->
+    <div id="section-products" class="hidden">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Products</h1><p>Browse and purchase from our catalog</p></div>
+      </div>
+      <div class="store-grid" id="store-grid"></div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="section-settings" class="hidden">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Settings</h1><p>Manage your account preferences</p></div>
+      </div>
+      <div class="settings-section">
+        <h3>Profile</h3>
+        <div class="settings-row"><label>Username</label><input class="settings-input" value="" id="set-username" readonly></div>
+        <div class="settings-row"><label>Email</label><input class="settings-input" placeholder="you@email.com" id="set-email"></div>
+        <div class="settings-row"><label>Discord</label><input class="settings-input" placeholder="user#1234" id="set-discord"></div>
+        <div style="margin-top:1rem"><button class="btn-sm" onclick="showToast('Profile updated!')">Save Changes</button></div>
+      </div>
+      <div class="settings-section">
+        <h3>Security</h3>
+        <div class="settings-row"><label>Current Password</label><input class="settings-input" type="password" placeholder="••••••••"></div>
+        <div class="settings-row"><label>New Password</label><input class="settings-input" type="password" placeholder="••••••••"></div>
+        <div style="margin-top:1rem"><button class="btn-sm" onclick="showToast('Password changed!')">Update Password</button></div>
+      </div>
+      <div class="settings-section">
+        <h3>Notifications</h3>
+        <div class="settings-row"><label>Order confirmations via Discord</label><input class="settings-input" placeholder="Webhook URL" style="width:280px"></div>
+        <div class="settings-row"><label>Email notifications</label><select class="settings-input" style="width:auto;padding-right:2rem"><option>Enabled</option><option>Disabled</option></select></div>
+        <div style="margin-top:1rem"><button class="btn-sm" onclick="showToast('Notification settings saved!')">Save</button></div>
+      </div>
+    </div>
+
+    <!-- API KEYS SECTION -->
+    <div id="section-apikeys" class="hidden">
+      <div class="topbar">
+        <div class="topbar-left"><h1>API Keys</h1><p>Integrate our services into your platform</p></div>
+      </div>
+      <div class="api-card">
+        <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.5rem">Production API Key</h3>
+        <p style="font-size:0.825rem;color:var(--muted)">Use this key in your production environment</p>
+        <div class="api-key-display">
+          <div class="api-key-val" id="prod-api-key">nxs_prod_••••••••••••••••••••••••••••••••</div>
+          <button class="copy-btn" onclick="revealKey('prod')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Reveal
+          </button>
+          <button class="copy-btn" onclick="copyKey()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+            Copy
+          </button>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.4rem">API Usage — 4,231 / 10,000 requests</div>
+        <div class="api-limit-bar"><div class="api-limit-fill" style="width:42%"></div></div>
+      </div>
+      <div class="api-card">
+        <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.5rem">Test API Key</h3>
+        <p style="font-size:0.825rem;color:var(--muted)">Safe for sandbox testing — no real charges</p>
+        <div class="api-key-display">
+          <div class="api-key-val">nxs_test_••••••••••••••••••••••••••••••••</div>
+          <button class="copy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+            Copy
+          </button>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.4rem">Test Usage — 187 / 1,000 requests</div>
+        <div class="api-limit-bar"><div class="api-limit-fill" style="width:18.7%"></div></div>
+      </div>
+      <div class="webhook-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        API documentation and webhook guides are available in your onboarding email. Contact support if you need your key regenerated.
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div id="admin-page" class="page hidden">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo" style="margin-bottom:1.5rem">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700">Admin <span style="color:var(--muted)">Panel</span></div>
+    </div>
+    <div class="admin-label">Overview</div>
+    <div class="admin-nav-item active" onclick="showAdminSection('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      Overview
+    </div>
+    <div class="admin-label">Manage</div>
+    <div class="admin-nav-item" onclick="showAdminSection('applications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+      Applications
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Users
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('products-admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+      Products
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('orders-admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+      All Orders
+    </div>
+    <div class="sidebar-bottom" style="margin-top:auto;padding-top:1rem">
+      <button onclick="logout()" style="width:100%;padding:0.6rem;background:rgba(252,165,165,0.08);border:1px solid rgba(252,165,165,0.15);border-radius:8px;color:#fca5a5;font-size:0.825rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <div id="admin-section-overview">
+      <div class="admin-header">
+        <h1>Admin Overview</h1>
+        <span class="admin-tag">OWNER ACCESS</span>
+      </div>
+      <div class="admin-stats">
+        <div class="admin-stat"><div class="admin-stat-val">48</div><div class="admin-stat-label">Total Users</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">7</div><div class="admin-stat-label">Pending Applications</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">$12,840</div><div class="admin-stat-label">Total Revenue</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">234</div><div class="admin-stat-label">Total Orders</div></div>
+      </div>
+      <div class="section-title" style="margin-bottom:1rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:18px;height:18px;color:var(--pp2)"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Recent Applications
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Discord</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-apps-tbody">
+            <tr><td>darkreseller</td><td>dark@mail.com</td><td>dark#9021</td><td>2 hours ago</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td><td style="display:flex;gap:6px"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>ghostkeys99</td><td>ghost@key.io</td><td>ghost#3311</td><td>5 hours ago</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td><td style="display:flex;gap:6px"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>voidshop</td><td>void@shop.net</td><td>void#0042</td><td>1 day ago</td><td><span class="status-pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div id="admin-section-applications" class="hidden">
+      <div class="admin-header"><h1>Applications</h1><span class="admin-tag">7 PENDING</span></div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Discord</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>darkreseller</td><td>dark@mail.com</td><td>dark#9021</td><td>2h ago</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td><td style="display:flex;gap:6px"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>ghostkeys99</td><td>ghost@key.io</td><td>ghost#3311</td><td>5h ago</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td><td style="display:flex;gap:6px"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>nexusdealer</td><td>nexus@deal.co</td><td>nexus#5500</td><td>12h ago</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td><td style="display:flex;gap:6px"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>voidshop</td><td>void@shop.net</td><td>void#0042</td><td>1d ago</td><td><span class="status-pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>luxkeys</td><td>lux@keys.store</td><td>lux#7721</td><td>2d ago</td><td><span class="status-pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>badactor</td><td>bad@spam.xyz</td><td>bad#0000</td><td>3d ago</td><td><span class="status-pill expired">Rejected</span></td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="admin-section-users" class="hidden">
+      <div class="admin-header"><h1>All Users</h1><span class="admin-tag">48 USERS</span></div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Balance</th><th>Orders</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>voidshop</td><td>void@shop.net</td><td style="color:var(--pp1)">$240.00</td><td>18</td><td>Jun 1, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>luxkeys</td><td>lux@keys.store</td><td style="color:var(--pp1)">$810.50</td><td>64</td><td>May 14, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>keystorm</td><td>storm@keys.gg</td><td style="color:var(--pp1)">$120.00</td><td>9</td><td>Apr 28, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>alpharesell</td><td>alpha@resell.io</td><td style="color:var(--pp1)">$3,200.00</td><td>201</td><td>Jan 3, 2025</td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS ADMIN -->
+    <div id="admin-section-products-admin" class="hidden">
+      <div class="admin-header">
+        <h1>Manage Products</h1>
+        <button class="btn-sm" onclick="showToast('Product creator coming soon!')">+ Add Product</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Sold</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>NexusVPN Pro</td><td>VPN</td><td style="color:var(--pp1)">$9.99/mo</td><td>∞</td><td>142</td><td style="display:flex;gap:6px"><button class="action-btn view">Edit</button><button class="action-btn reject">Delete</button></td></tr>
+            <tr><td>StreamPass Ultra</td><td>Streaming</td><td style="color:var(--pp1)">$14.99/mo</td><td>∞</td><td>89</td><td style="display:flex;gap:6px"><button class="action-btn view">Edit</button><button class="action-btn reject">Delete</button></td></tr>
+            <tr><td>GameKeys Bundle</td><td>Gaming</td><td style="color:var(--pp1)">$24.99</td><td>47</td><td>203</td><td style="display:flex;gap:6px"><button class="action-btn view">Edit</button><button class="action-btn reject">Delete</button></td></tr>
+            <tr><td>CloudStore 1TB</td><td>Cloud</td><td style="color:var(--pp1)">$4.99/mo</td><td>∞</td><td>311</td><td style="display:flex;gap:6px"><button class="action-btn view">Edit</button><button class="action-btn reject">Delete</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS ADMIN -->
+    <div id="admin-section-orders-admin" class="hidden">
+      <div class="admin-header"><h1>All Orders</h1><span class="admin-tag">234 TOTAL</span></div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Order ID</th><th>User</th><th>Product</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="key-mono">#NX-4821</span></td><td>luxkeys</td><td>NexusVPN Pro</td><td style="color:var(--pp1)">$9.99</td><td>Jun 5, 2026</td><td><span class="status-pill active">Completed</span></td></tr>
+            <tr><td><span class="key-mono">#NX-4820</span></td><td>voidshop</td><td>GameKeys Bundle</td><td style="color:var(--pp1)">$24.99</td><td>Jun 4, 2026</td><td><span class="status-pill active">Completed</span></td></tr>
+            <tr><td><span class="key-mono">#NX-4819</span></td><td>alpharesell</td><td>StreamPass Ultra</td><td style="color:var(--pp1)">$14.99</td><td>Jun 3, 2026</td><td><span class="status-pill active">Completed</span></td></tr>
+            <tr><td><span class="key-mono">#NX-4818</span></td><td>keystorm</td><td>CloudStore 1TB</td><td style="color:var(--pp1)">$4.99</td><td>Jun 2, 2026</td><td><span class="status-pill" style="background:rgba(251,191,36,0.1);color:#fde68a;border:1px solid rgba(251,191,36,0.2)">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  <span id="toast-msg">Action complete!</span>
+</div>
+
+<script>
+// ===== STATE =====
+const DISCORD_WEBHOOK = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+
+const DEMO_USERS = {
+  'demo': { pass: 'demo123', balance: 240.50, spent: 89.97, orders: 12 },
+  'reseller': { pass: 'pass123', balance: 810.00, spent: 214.85, orders: 47 }
+};
+
+const ADMIN_CREDS = { user: 'ASXKOSMYOWNER', pass: 'ASXOWNER67CHEATSKOSMY' };
+
+let currentUser = null;
+let pendingApplications = [];
+
+// Load from sessionStorage
+const stored = sessionStorage.getItem('nx_session');
+if (stored) {
+  const s = JSON.parse(stored);
+  currentUser = s.user;
+  if (s.isAdmin) { initAdmin(); }
+  else { initDashboard(currentUser); }
+}
+
+// ===== AUTH =====
+function showLogin() {
+  document.getElementById('login-form').classList.remove('hidden');
+  document.getElementById('register-form').classList.add('hidden');
+  document.getElementById('admin-login-form').classList.add('hidden');
+}
+function showRegister() {
+  document.getElementById('login-form').classList.add('hidden');
+  document.getElementById('register-form').classList.remove('hidden');
+  document.getElementById('admin-login-form').classList.add('hidden');
+}
+function showAdminLogin() {
+  document.getElementById('login-form').classList.add('hidden');
+  document.getElementById('register-form').classList.add('hidden');
+  document.getElementById('admin-login-form').classList.remove('hidden');
+}
+
+function handleLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const msgEl = document.getElementById('login-msg');
+
+  if (!u || !p) { msgEl.innerHTML = '<div class="msg error">Please fill in all fields.</div>'; return; }
+
+  if (DEMO_USERS[u] && DEMO_USERS[u].pass === p) {
+    msgEl.innerHTML = '';
+    sessionStorage.setItem('nx_session', JSON.stringify({ user: u, isAdmin: false }));
+    currentUser = u;
+    initDashboard(u);
+  } else {
+    msgEl.innerHTML = '<div class="msg error">Invalid username or password.</div>';
+  }
+}
+
+function handleAdminLogin() {
+  const u = document.getElementById('admin-user').value.trim();
+  const p = document.getElementById('admin-pass').value;
+  const msgEl = document.getElementById('admin-login-msg');
+
+  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
+    sessionStorage.setItem('nx_session', JSON.stringify({ user: 'OWNER', isAdmin: true }));
+    initAdmin();
+  } else {
+    msgEl.innerHTML = '<div class="msg error">Invalid admin credentials.</div>';
+  }
+}
+
+async function handleRegister() {
+  const u = document.getElementById('reg-user').value.trim();
+  const e = document.getElementById('reg-email').value.trim();
+  const p = document.getElementById('reg-pass').value;
+  const d = document.getElementById('reg-discord').value.trim();
+  const msgEl = document.getElementById('reg-msg');
+
+  if (!u || !e || !p || !d) { msgEl.innerHTML = '<div class="msg error">All fields are required.</div>'; return; }
+
+  // Send to Discord webhook
+  try {
+    await fetch(DISCORD_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '📥 New Reseller Application',
+          color: 0xC084FC,
+          fields: [
+            { name: 'Username', value: u, inline: true },
+            { name: 'Email', value: e, inline: true },
+            { name: 'Discord', value: d, inline: true },
+          ],
+          footer: { text: 'NexusShop Reseller Panel • ' + new Date().toLocaleString() },
+          thumbnail: { url: 'https://i.imgur.com/AfFp7pu.png' }
+        }]
+      })
+    });
+  } catch(err) {
+    console.log('Webhook note:', err.message);
+  }
+
+  // Store pending app
+  pendingApplications.push({ user: u, email: e, discord: d, time: new Date() });
+
+  // Show pending page
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('pending-page').classList.remove('hidden');
+}
+
+function logout() {
+  sessionStorage.removeItem('nx_session');
+  currentUser = null;
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('admin-page').classList.add('hidden');
+  document.getElementById('auth-page').classList.remove('hidden');
+  showLogin();
+}
+
+// ===== DASHBOARD =====
+function initDashboard(username) {
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('pending-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.remove('hidden');
+
+  const userData = DEMO_USERS[username] || { balance: 0, spent: 0, orders: 0 };
+  const initials = username.slice(0,2).toUpperCase();
+
+  document.getElementById('sidebar-avatar').textContent = initials;
+  document.getElementById('sidebar-username').textContent = username;
+  document.getElementById('welcome-msg').textContent = 'Welcome Back, ' + username;
+  document.getElementById('stat-balance').textContent = '$' + userData.balance.toFixed(2);
+  document.getElementById('stat-spent').textContent = '$' + userData.spent.toFixed(2);
+  document.getElementById('stat-orders').textContent = userData.orders;
+  document.getElementById('set-username').value = username;
+
+  // Time
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  // Populate top products
+  renderTopProducts();
+  renderKeys();
+  renderOrders();
+  renderStore();
+
+  showSection('home');
+}
+
+function updateTime() {
+  const now = new Date();
+  document.getElementById('topbar-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('welcome-date').textContent = now.toLocaleDateString([], { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+const PRODUCTS_DATA = [
+  { name: 'NexusVPN Pro', cat: 'VPN Service', price: '$9.99/mo', orders: 8, color: '#7c3aed', icon: 'vpn' },
+  { name: 'StreamPass Ultra', cat: 'Streaming', price: '$14.99/mo', orders: 3, color: '#d946ef', icon: 'stream' },
+  { name: 'GameKeys Bundle', cat: 'Gaming', price: '$24.99', orders: 1, color: '#9333ea', icon: 'game' }
+];
+
+function productSVG(type) {
+  const icons = {
+    vpn: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" style="width:24px;height:24px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>`,
+    stream: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" style="width:24px;height:24px"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>`,
+    game: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" style="width:24px;height:24px"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z"/></svg>`
+  };
+  return icons[type] || icons.vpn;
+}
+
+function renderTopProducts() {
+  const grid = document.getElementById('top-products-grid');
+  grid.innerHTML = PRODUCTS_DATA.map(p => `
+    <div class="product-card">
+      <div class="product-icon" style="background:${p.color}22;border:1px solid ${p.color}44">${productSVG(p.icon)}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-cat">${p.cat}</div>
+      <div class="product-footer">
+        <div class="product-price">${p.price}</div>
+        <div class="product-orders">${p.orders} orders</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderKeys() {
+  const tbody = document.getElementById('keys-tbody');
+  const keys = [
+    { product: 'NexusVPN Pro', key: 'NXS-AAAA-BBBB-CCCC', exp: 'Jul 1, 2026', status: 'active' },
+    { product: 'StreamPass Ultra', key: 'NXS-XXXX-YYYY-ZZZZ', exp: 'Jun 15, 2026', status: 'active' },
+    { product: 'GameKeys Bundle', key: 'NXS-1234-5678-9ABC', exp: 'Jan 1, 2026', status: 'expired' }
+  ];
+  tbody.innerHTML = keys.map(k => `
+    <tr>
+      <td>${k.product}</td>
+      <td><span class="key-mono">${k.key}</span></td>
+      <td>${k.exp}</td>
+      <td><span class="status-pill ${k.status}">${k.status.charAt(0).toUpperCase() + k.status.slice(1)}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  const orders = [
+    { id:'#NX-4821', product:'NexusVPN Pro', amount:'$9.99', date:'Jun 5, 2026' },
+    { id:'#NX-4812', product:'StreamPass Ultra', amount:'$14.99', date:'May 28, 2026' },
+    { id:'#NX-4798', product:'GameKeys Bundle', amount:'$24.99', date:'May 20, 2026' },
+    { id:'#NX-4777', product:'NexusVPN Pro', amount:'$9.99', date:'May 5, 2026' },
+    { id:'#NX-4750', product:'CloudStore 1TB', amount:'$4.99', date:'Apr 28, 2026' },
+  ];
+  list.innerHTML = orders.map(o => `
+    <div class="order-row">
+      <div class="order-id">${o.id}</div>
+      <div class="order-product">${o.product}</div>
+      <div class="order-amount">${o.amount}</div>
+      <div class="order-date">${o.date}</div>
+    </div>
+  `).join('');
+}
+
+function renderStore() {
+  const grid = document.getElementById('store-grid');
+  const items = [
+    { name: 'NexusVPN Pro', price: '$9.99/mo', desc: 'Blazing fast VPN with 50+ server locations, zero logs, and kill switch protection.', features: ['50+ countries', 'Zero logs policy', 'Kill switch', 'Up to 10 devices'], color: '#7c3aed', icon: 'vpn' },
+    { name: 'StreamPass Ultra', price: '$14.99/mo', desc: 'Access 20+ premium streaming platforms under one subscription. 4K quality guaranteed.', features: ['20+ platforms', '4K HDR streaming', 'Family plan', 'Offline downloads'], color: '#d946ef', icon: 'stream' },
+    { name: 'GameKeys Bundle', price: '$24.99', desc: 'Monthly bundle of 5 premium game keys across all major platforms.', features: ['5 keys per month', 'PC, Xbox, PS5', 'Exclusive titles', 'Instant delivery'], color: '#9333ea', icon: 'game' },
+    { name: 'CloudStore 1TB', price: '$4.99/mo', desc: 'Secure cloud storage with end-to-end encryption and unlimited file sharing.', features: ['1TB storage', 'E2E encrypted', 'Unlimited sharing', '99.9% uptime'], color: '#c084fc', icon: 'vpn' },
+  ];
+  grid.innerHTML = items.map(i => `
+    <div class="store-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.75rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:${i.color}22;border:1px solid ${i.color}44;display:flex;align-items:center;justify-content:center">${productSVG(i.icon)}</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:600">${i.name}</div>
+          <div class="store-price">${i.price}</div>
+        </div>
+      </div>
+      <p class="store-desc">${i.desc}</p>
+      <ul class="store-features">
+        ${i.features.map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>${f}</li>`).join('')}
+      </ul>
+      <button class="buy-btn" onclick="showToast('Added to cart!')">Purchase Now</button>
+    </div>
+  `).join('');
+}
+
+function showSection(id) {
+  const sections = ['home','keys','orders','products','settings','apikeys'];
+  sections.forEach(s => {
+    document.getElementById('section-'+s).classList.toggle('hidden', s !== id);
+  });
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', el.getAttribute('onclick') === `showSection('${id}')`);
+  });
+}
+
+// ===== ADMIN =====
+function initAdmin() {
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('admin-page').classList.remove('hidden');
+  showAdminSection('overview');
+}
+
+function showAdminSection(id) {
+  const sections = ['overview','applications','users','products-admin','orders-admin'];
+  sections.forEach(s => {
+    document.getElementById('admin-section-'+s).classList.toggle('hidden', s !== id);
+  });
+  document.querySelectorAll('.admin-nav-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick') === `showAdminSection('${id}')`);
+  });
+}
+
+function approveApp(btn) {
+  const row = btn.closest('tr');
+  const td = row.querySelector('td:nth-child(5)');
+  td.innerHTML = '<span class="status-pill active">Approved</span>';
+  const actCell = row.querySelector('td:last-child');
+  actCell.innerHTML = '<button class="action-btn view">View</button>';
+  showToast('Application approved!');
+}
+function rejectApp(btn) {
+  const row = btn.closest('tr');
+  const td = row.querySelector('td:nth-child(5)');
+  td.innerHTML = '<span class="status-pill expired">Rejected</span>';
+  const actCell = row.querySelector('td:last-child');
+  actCell.innerHTML = '<button class="action-btn view">View</button>';
+  showToast('Application rejected.');
+}
+
+// ===== UTILS =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function revealKey(type) {
+  if (type === 'prod') {
+    document.getElementById('prod-api-key').textContent = 'nxs_prod_k9mX2vR8wQ4nL7pJ3cF6bH1tY5sE0dA';
+    showToast('Key revealed — keep it safe!');
+  }
+}
+function copyKey() {
+  navigator.clipboard.writeText('nxs_prod_k9mX2vR8wQ4nL7pJ3cF6bH1tY5sE0dA').then(() => showToast('API key copied!'));
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const lf = document.getElementById('login-form');
+    const rf = document.getElementById('register-form');
+    const af = document.getElementById('admin-login-form');
+    if (!lf.classList.contains('hidden')) handleLogin();
+    else if (!rf.classList.contains('hidden')) handleRegister();
+    else if (!af.classList.contains('hidden')) handleAdminLogin();
+  }
+});
+</script>
+</body>
+</html>
