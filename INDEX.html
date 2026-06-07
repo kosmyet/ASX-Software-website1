@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta name="referrer" content="no-referrer">
+<title>ASX Software</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #b76ef0;
+  --accent-soft: #c98af5;
+  --accent-dim: rgba(183,110,240,0.12);
+  --accent-border: rgba(183,110,240,0.22);
+  --pink: #d46ef0;
+  --bg: #0c0c10;
+  --bg2: #111118;
+  --bg3: #16161f;
+  --card: #13131a;
+  --card2: #181820;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.11);
+  --text: #f0edf5;
+  --text2: #9b96a8;
+  --text3: #5c5868;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+.hidden { display: none !important; }
+
+/* ─── SUBTLE BG TINT ─── */
+.bg-tint {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 35% at 15% 0%, rgba(183,110,240,0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 40% 30% at 85% 100%, rgba(212,110,240,0.04) 0%, transparent 100%);
+}
+
+/* ─── AUTH ─── */
+#auth-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 1.5rem; position: relative; z-index: 1;
+}
+.auth-wrap { width: 100%; max-width: 380px; }
+.auth-logo {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 2.25rem; justify-content: center;
+}
+.auth-logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-logo-mark svg { width: 18px; height: 18px; }
+.auth-logo-name {
+  font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: var(--text);
+}
+.auth-logo-name span { color: var(--accent-soft); }
+.auth-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+}
+.auth-heading { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 4px; }
+.auth-sub { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+.field { margin-bottom: 12px; }
+.field label {
+  display: block; font-size: 12px; font-weight: 500;
+  color: var(--text2); margin-bottom: 5px;
+}
+.field input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.field input::placeholder { color: var(--text3); }
+.field input:focus { border-color: var(--accent); }
+.btn {
+  display: block; width: 100%;
+  padding: 9px 16px;
+  background: var(--accent);
+  border: none; border-radius: var(--radius);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px; font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  margin-top: 4px;
+  letter-spacing: -0.1px;
+}
+.btn:hover { background: var(--accent-soft); }
+.auth-footer {
+  text-align: center; margin-top: 1rem;
+  font-size: 13px; color: var(--text2);
+}
+.auth-footer a { color: var(--accent-soft); cursor: pointer; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
+.msg {
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.msg.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #f87171; }
+.msg.success { background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--accent-soft); }
+.divider-link {
+  text-align: center; margin-top: 12px;
+  font-size: 12px; color: var(--text3);
+}
+.divider-link a { color: var(--text2); cursor: pointer; }
+.divider-link a:hover { color: var(--accent-soft); }
+
+/* ─── PENDING ─── */
+#pending-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 1.5rem; position: relative; z-index: 1;
+}
+.pending-box {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+  width: 100%; max-width: 380px; text-align: center;
+}
+.pending-icon {
+  width: 52px; height: 52px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.pending-icon svg { width: 24px; height: 24px; }
+.pending-box h2 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.pending-box p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.18);
+  color: #fbbf24; padding: 4px 10px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 500; margin: 1rem auto;
+}
+.pulse { width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.btn-outline {
+  display: inline-block; margin-top: 1.25rem;
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text2); font-family: 'Inter', sans-serif;
+  font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.btn-outline:hover { border-color: var(--accent-border); color: var(--accent-soft); }
+
+/* ─── DASHBOARD ─── */
+#dashboard-page { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 1.25rem 0.75rem;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  z-index: 10;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 0.5rem; margin-bottom: 1.75rem;
+}
+.logo-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 16px; height: 16px; }
+.logo-text { font-size: 13.5px; font-weight: 600; letter-spacing: -0.1px; }
+.logo-text span { color: var(--accent-soft); }
+
+.nav-label {
+  font-size: 10.5px; font-weight: 500; letter-spacing: 0.07em;
+  color: var(--text3); text-transform: uppercase;
+  padding: 0 0.5rem; margin: 1rem 0 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px; border-radius: 8px;
+  cursor: pointer; color: var(--text2);
+  font-size: 13.5px; font-weight: 400;
+  transition: background 0.12s, color 0.12s;
+  border: 1px solid transparent;
+}
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active {
+  background: var(--accent-dim);
+  color: var(--accent-soft);
+  border-color: var(--accent-border);
+  font-weight: 500;
+}
+.sidebar-spacer { flex: 1; }
+.user-chip {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.avatar {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: white; flex-shrink: 0;
+}
+.user-chip-info { flex: 1; min-width: 0; }
+.user-chip-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-chip-role { font-size: 11px; color: var(--text3); }
+.logout-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; padding: 3px; border-radius: 5px;
+  display: flex; transition: color 0.12s;
+}
+.logout-btn:hover { color: #f87171; }
+.logout-btn svg { width: 14px; height: 14px; }
+
+/* ─── MAIN ─── */
+.main { margin-left: 220px; flex: 1; padding: 2rem 2.25rem; position: relative; z-index: 1; max-width: calc(100vw - 220px); }
+.page-header { margin-bottom: 1.75rem; }
+.page-header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 2px; }
+.page-header p { font-size: 13px; color: var(--text2); }
+
+/* ─── STATS ─── */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.75rem; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.125rem 1.25rem;
+}
+.stat-label {
+  font-size: 11.5px; font-weight: 500; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+}
+.stat-label svg { width: 13px; height: 13px; }
+.stat-val { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; color: var(--text); }
+.stat-val.purple { color: var(--accent-soft); }
+.stat-sub { font-size: 11.5px; color: var(--text3); margin-top: 4px; }
+.stat-sub .up { color: #6ee7b7; }
+.stat-sub .dn { color: #f87171; }
+
+/* ─── SECTION TITLE ─── */
+.sec-title {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 6px;
+}
+.sec-title svg { width: 15px; height: 15px; color: var(--accent); }
+
+/* ─── PRODUCT CARDS ─── */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.product-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.125rem;
+  transition: border-color 0.15s;
+}
+.product-card:hover { border-color: var(--border2); }
+.prod-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.prod-icon svg { width: 18px; height: 18px; }
+.prod-name { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+.prod-cat { font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+.prod-footer { display: flex; align-items: center; justify-content: space-between; }
+.prod-price { font-size: 13.5px; font-weight: 600; color: var(--accent-soft); }
+.prod-orders { font-size: 11.5px; color: var(--text3); }
+
+/* ─── TABLE ─── */
+.table-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-size: 11.5px; font-weight: 500; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.data-table td {
+  padding: 11px 14px; font-size: 13.5px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.pill {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 500;
+}
+.pill.active { background: rgba(110,231,183,0.08); color: #6ee7b7; border: 1px solid rgba(110,231,183,0.18); }
+.pill.expired { background: rgba(248,113,113,0.08); color: #f87171; border: 1px solid rgba(248,113,113,0.18); }
+.pill.pending { background: rgba(251,191,36,0.08); color: #fbbf24; border: 1px solid rgba(251,191,36,0.18); }
+.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--accent-soft); background: var(--accent-dim); padding: 2px 7px; border-radius: 5px; }
+
+/* ─── ORDERS LIST ─── */
+.order-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-bottom: 1px solid var(--border);
+}
+.order-row:last-child { border-bottom: none; }
+.order-id { font-size: 12px; color: var(--text3); min-width: 80px; font-variant-numeric: tabular-nums; }
+.order-product { flex: 1; font-size: 13.5px; }
+.order-amt { font-size: 13.5px; font-weight: 500; color: var(--accent-soft); min-width: 60px; text-align: right; }
+.order-date { font-size: 12px; color: var(--text3); min-width: 90px; text-align: right; }
+
+/* ─── SETTINGS ─── */
+.settings-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 10px;
+}
+.settings-card h3 { font-size: 13.5px; font-weight: 600; margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; }
+.setting-row label { font-size: 13px; color: var(--text2); }
+.s-input {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 7px 10px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px;
+  width: 210px; outline: none; transition: border-color 0.15s;
+}
+.s-input:focus { border-color: var(--accent); }
+.btn-sm {
+  padding: 6px 14px; background: var(--accent);
+  border: none; border-radius: 7px;
+  color: white; font-family: 'Inter', sans-serif; font-size: 12.5px;
+  font-weight: 500; cursor: pointer; transition: background 0.15s;
+  margin-top: 10px;
+}
+.btn-sm:hover { background: var(--accent-soft); }
+
+/* ─── API KEYS ─── */
+.api-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 10px;
+}
+.api-card h3 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+.api-card p { font-size: 12.5px; color: var(--text2); margin-bottom: 12px; }
+.api-key-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;
+}
+.api-key-val { flex: 1; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--accent-soft); word-break: break-all; }
+.icon-btn {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 4px 8px; color: var(--text2);
+  font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+  transition: color 0.12s, border-color 0.12s; white-space: nowrap;
+}
+.icon-btn:hover { color: var(--accent-soft); border-color: var(--accent-border); }
+.icon-btn svg { width: 13px; height: 13px; }
+.usage-text { font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+.usage-bar { background: var(--bg3); height: 4px; border-radius: 2px; overflow: hidden; }
+.usage-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--pink)); border-radius: 2px; }
+
+/* ─── STORE ─── */
+.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.store-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.25rem;
+  transition: border-color 0.15s;
+}
+.store-card:hover { border-color: var(--border2); }
+.store-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.store-name { font-size: 13.5px; font-weight: 600; }
+.store-price { font-size: 18px; font-weight: 600; color: var(--accent-soft); letter-spacing: -0.4px; margin-bottom: 6px; }
+.store-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; margin-bottom: 12px; }
+.store-features { list-style: none; margin-bottom: 14px; }
+.store-features li { font-size: 12.5px; color: var(--text2); display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.store-features li svg { width: 13px; height: 13px; color: var(--accent); flex-shrink: 0; }
+.buy-btn {
+  width: 100%; padding: 8px 14px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px; color: var(--accent-soft);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.buy-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 1.25rem; right: 1.25rem;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; z-index: 1000;
+  animation: slideUp 0.2s ease; color: var(--text);
+}
+.toast svg { width: 15px; height: 15px; color: var(--accent-soft); flex-shrink: 0; }
+@keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ─── ADMIN ─── */
+#admin-page { display: flex; min-height: 100vh; }
+.admin-sidebar {
+  width: 200px; flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  padding: 1.25rem 0.75rem;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  z-index: 10;
+}
+.admin-nav-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 9px; border-radius: 7px; cursor: pointer;
+  color: var(--text2); font-size: 13.5px;
+  transition: background 0.12s, color 0.12s;
+  border: 1px solid transparent;
+}
+.admin-nav-item svg { width: 15px; height: 15px; }
+.admin-nav-item:hover { background: var(--bg3); color: var(--text); }
+.admin-nav-item.active { background: var(--accent-dim); color: var(--accent-soft); border-color: var(--accent-border); font-weight: 500; }
+.admin-main { margin-left: 200px; flex: 1; padding: 2rem 2.25rem; }
+.admin-tag {
+  display: inline-block;
+  background: var(--accent-dim); border: 1px solid var(--accent-border);
+  color: var(--accent-soft); font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em;
+}
+.admin-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.75rem; }
+.admin-stat {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1rem 1.125rem;
+}
+.admin-stat-val { font-size: 20px; font-weight: 600; letter-spacing: -0.4px; color: var(--accent-soft); }
+.admin-stat-label { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.action-btn {
+  padding: 4px 10px; border-radius: 6px; font-size: 12px;
+  cursor: pointer; border: 1px solid; font-family: 'Inter', sans-serif;
+  font-weight: 500; transition: opacity 0.15s;
+}
+.action-btn.approve { background: rgba(110,231,183,0.08); color: #6ee7b7; border-color: rgba(110,231,183,0.2); }
+.action-btn.reject  { background: rgba(248,113,113,0.08); color: #f87171; border-color: rgba(248,113,113,0.2); }
+.action-btn.view    { background: var(--accent-dim); color: var(--accent-soft); border-color: var(--accent-border); }
+.action-btn:hover { opacity: 0.75; }
+.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.page-head h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+.flex-gap { display: flex; gap: 6px; align-items: center; }
+.logout-row {
+  margin-top: auto; padding-top: 1rem;
+}
+.logout-row button {
+  width: 100%; padding: 7px 10px;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--text2); font-family: 'Inter', sans-serif;
+  font-size: 13px; cursor: pointer; display: flex; align-items: center;
+  gap: 7px; justify-content: center; transition: border-color 0.15s, color 0.15s;
+}
+.logout-row button:hover { border-color: rgba(248,113,113,0.3); color: #f87171; }
+.logout-row button svg { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="bg-tint"></div>
+
+<!-- ═══════════════════════════════════
+     AUTH
+════════════════════════════════════ -->
+<div id="auth-page">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="auth-logo-name">ASX <span>Software</span></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-form" class="auth-box">
+      <div class="auth-heading">Sign in</div>
+      <div class="auth-sub">Access your reseller account</div>
+      <div id="login-msg"></div>
+      <div class="field"><label>Username</label><input id="login-user" type="text" placeholder="your_username" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn" onclick="handleLogin()">Sign in</button>
+      <div class="auth-footer">No account? <a onclick="showRegister()">Apply for access</a></div>
+      <div class="divider-link"><a onclick="showAdminLogin()">Admin →</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-form" class="auth-box hidden">
+      <div class="auth-heading">Apply for access</div>
+      <div class="auth-sub">Submit your reseller application</div>
+      <div id="reg-msg"></div>
+      <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="your_username"></div>
+      <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="••••••••"></div>
+      <div class="field"><label>Discord</label><input id="reg-discord" type="text" placeholder="user#1234"></div>
+      <button class="btn" onclick="handleRegister()">Submit application</button>
+      <div class="auth-footer">Already have access? <a onclick="showLogin()">Sign in</a></div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="admin-login-form" class="auth-box hidden">
+      <div class="auth-heading">Admin access</div>
+      <div class="auth-sub">Restricted to authorized personnel</div>
+      <div id="admin-login-msg"></div>
+      <div class="field"><label>Username</label><input id="admin-user" type="text" placeholder="admin_username"></div>
+      <div class="field"><label>Password</label><input id="admin-pass" type="password" placeholder="••••••••"></div>
+      <button class="btn" onclick="handleAdminLogin()">Access panel</button>
+      <div class="auth-footer"><a onclick="showLogin()">← Back</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PENDING
+════════════════════════════════════ -->
+<div id="pending-page" class="hidden">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;position:relative;z-index:1">
+    <div class="pending-box">
+      <div class="pending-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-soft)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+        </svg>
+      </div>
+      <h2>Application received</h2>
+      <div class="status-badge"><div class="pulse"></div>Pending review</div>
+      <p>Your application has been sent to the higher ups. You'll hear back within 24–48 hours once it's been reviewed.</p>
+      <button class="btn-outline" onclick="showLogin()">Back to sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     DASHBOARD
+════════════════════════════════════ -->
+<div id="dashboard-page" class="hidden">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-text">ASX <span>Software</span></div>
+    </div>
+
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="showSection('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('keys')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+      Keys
+    </div>
+    <div class="nav-item" onclick="showSection('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+      Orders
+    </div>
+    <div class="nav-item" onclick="showSection('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+      Products
+    </div>
+    <div class="nav-item" onclick="showSection('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Settings
+    </div>
+    <div class="nav-item" onclick="showSection('apikeys')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+      API Keys
+    </div>
+
+    <div class="sidebar-spacer"></div>
+    <div class="user-chip">
+      <div class="avatar" id="sidebar-avatar">U</div>
+      <div class="user-chip-info">
+        <div class="user-chip-name" id="sidebar-username">User</div>
+        <div class="user-chip-role">Reseller</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Log out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- HOME -->
+    <div id="section-home">
+      <div class="page-header">
+        <h1 id="welcome-msg">Welcome back</h1>
+        <p id="welcome-date" style="color:var(--text2)"></p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18-3a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6"/></svg>
+            Balance
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="stat-val purple" id="stat-balance">$0.00</div>
+            <button class="btn-sm" onclick="topUpBalance()" style="margin:0;padding:4px 10px;font-size:11px">Top Up</button>
+          </div>
+          <div class="stat-sub">Available to spend</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            Spent this week
+          </div>
+          <div class="stat-val" id="stat-spent">$0.00</div>
+          <div class="stat-sub"><span class="dn">↓ 12%</span> vs last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+            Orders this week
+          </div>
+          <div class="stat-val" id="stat-orders">0</div>
+          <div class="stat-sub"><span class="up">↑ 8%</span> vs last week</div>
+        </div>
+      </div>
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+        Top purchased products
+      </div>
+      <div class="products-grid" id="top-products-grid"></div>
+    </div>
+
+    <!-- KEYS -->
+    <div id="section-keys" class="hidden">
+      <div class="page-header"><h1>License keys</h1><p>Your active and expired keys</p></div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Product</th><th>Key</th><th>Expires</th><th>Status</th></tr></thead>
+          <tbody id="keys-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="section-orders" class="hidden">
+      <div class="page-header"><h1>Order history</h1><p>All your past purchases</p></div>
+      <div class="table-box" id="orders-list"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="section-products" class="hidden">
+      <div class="page-header"><h1>Products</h1><p>Browse our catalog</p></div>
+      <div class="store-grid" id="store-grid"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="section-settings" class="hidden">
+      <div class="page-header"><h1>Settings</h1><p>Manage your account</p></div>
+      <div class="settings-card">
+        <h3>Profile</h3>
+        <div class="setting-row"><label>Username</label><input class="s-input" id="set-username" readonly></div>
+        <div class="setting-row"><label>Email</label><input class="s-input" id="set-email" placeholder="you@example.com"></div>
+        <div class="setting-row"><label>Discord</label><input class="s-input" id="set-discord" placeholder="user#1234"></div>
+        <button class="btn-sm" onclick="showToast('Profile updated')">Save changes</button>
+      </div>
+      <div class="settings-card">
+        <h3>Security</h3>
+        <div class="setting-row"><label>Current password</label><input class="s-input" type="password" placeholder="••••••••"></div>
+        <div class="setting-row"><label>New password</label><input class="s-input" type="password" placeholder="••••••••"></div>
+        <button class="btn-sm" onclick="showToast('Password updated')">Update password</button>
+      </div>
+      <div class="settings-card">
+        <h3>Notifications</h3>
+        <div class="setting-row"><label>Discord webhook</label><input class="s-input" placeholder="https://discord.com/api/webhooks/..."></div>
+        <div class="setting-row"><label>Email notifications</label>
+          <select class="s-input" style="width:auto"><option>Enabled</option><option>Disabled</option></select>
+        </div>
+        <button class="btn-sm" onclick="showToast('Saved')">Save</button>
+      </div>
+    </div>
+
+    <!-- API KEYS -->
+    <div id="section-apikeys" class="hidden">
+      <div class="page-header"><h1>API keys</h1><p>Integrate with our platform</p></div>
+      <div class="api-card">
+        <h3>Production key</h3>
+        <p>Use in your live environment. Keep this private.</p>
+        <div class="api-key-row">
+          <div class="api-key-val" id="prod-key-val">asx_prod_••••••••••••••••••••••••••••••</div>
+          <button class="icon-btn" onclick="revealKey()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Reveal
+          </button>
+          <button class="icon-btn" onclick="copyKey()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="usage-text">Usage — 4,231 / 10,000 requests this month</div>
+        <div class="usage-bar"><div class="usage-fill" style="width:42.3%"></div></div>
+      </div>
+      <div class="api-card">
+        <h3>Test key</h3>
+        <p>Safe for sandbox use. No real charges apply.</p>
+        <div class="api-key-row">
+          <div class="api-key-val" id="test-key-val">asx_test_••••••••••••••••••••••••••••••</div>
+          <button class="icon-btn" onclick="KeyManager.revealKey('test-key-val', 'test')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Reveal
+          </button>
+          <button class="icon-btn" onclick="KeyManager.copyKey('test')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="usage-text">Usage — 187 / 1,000 requests this month</div>
+        <div class="usage-bar"><div class="usage-fill" style="width:18.7%"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════
+     ADMIN
+════════════════════════════════════ -->
+<div id="admin-page" class="hidden">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo" style="margin-bottom:1.5rem">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="logo-text">ASX <span>Admin</span></div>
+    </div>
+
+    <div class="nav-label">Overview</div>
+    <div class="admin-nav-item active" onclick="showAdminSection('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      Overview
+    </div>
+
+    <div class="nav-label">Manage</div>
+    <div class="admin-nav-item" onclick="showAdminSection('applications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+      Applications
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Users
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('products-admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+      Products
+    </div>
+    <div class="admin-nav-item" onclick="showAdminSection('orders-admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+      Orders
+    </div>
+
+    <div class="logout-row">
+      <button onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <div id="admin-section-overview">
+      <div class="page-head">
+        <div>
+          <h1>Overview</h1>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px">ASX Software admin panel</div>
+        </div>
+        <span class="admin-tag">Owner access</span>
+      </div>
+      <div class="admin-stats-row">
+        <div class="admin-stat"><div class="admin-stat-val">48</div><div class="admin-stat-label">Total users</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">7</div><div class="admin-stat-label">Pending applications</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">$12,840</div><div class="admin-stat-label">Total revenue</div></div>
+        <div class="admin-stat"><div class="admin-stat-val">234</div><div class="admin-stat-label">Total orders</div></div>
+      </div>
+      <div class="sec-title" style="margin-bottom:1rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Recent applications
+      </div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Discord</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>darkreseller</td><td>dark@mail.com</td><td>dark#9021</td><td>2 hours ago</td><td><span class="pill pending">Pending</span></td><td class="flex-gap"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>ghostkeys99</td><td>ghost@key.io</td><td>ghost#3311</td><td>5 hours ago</td><td><span class="pill pending">Pending</span></td><td class="flex-gap"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>voidshop</td><td>void@shop.net</td><td>void#0042</td><td>1 day ago</td><td><span class="pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div id="admin-section-applications" class="hidden">
+      <div class="page-head"><h1>Applications</h1><span class="admin-tag">7 pending</span></div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Discord</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>darkreseller</td><td>dark@mail.com</td><td>dark#9021</td><td>2h ago</td><td><span class="pill pending">Pending</span></td><td class="flex-gap"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>ghostkeys99</td><td>ghost@key.io</td><td>ghost#3311</td><td>5h ago</td><td><span class="pill pending">Pending</span></td><td class="flex-gap"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>nexusdealer</td><td>nexus@deal.co</td><td>nexus#5500</td><td>12h ago</td><td><span class="pill pending">Pending</span></td><td class="flex-gap"><button class="action-btn approve" onclick="approveApp(this)">Approve</button><button class="action-btn reject" onclick="rejectApp(this)">Reject</button></td></tr>
+            <tr><td>voidshop</td><td>void@shop.net</td><td>void#0042</td><td>1d ago</td><td><span class="pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>luxkeys</td><td>lux@keys.store</td><td>lux#7721</td><td>2d ago</td><td><span class="pill active">Approved</span></td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>badactor</td><td>bad@spam.xyz</td><td>bad#0000</td><td>3d ago</td><td><span class="pill expired">Rejected</span></td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="admin-section-users" class="hidden">
+      <div class="page-head"><h1>Users</h1><span class="admin-tag">48 total</span></div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Username</th><th>Email</th><th>Balance</th><th>Orders</th><th>Joined</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>voidshop</td><td>void@shop.net</td><td style="color:var(--accent-soft)">$240.00</td><td>18</td><td>Jun 1, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>luxkeys</td><td>lux@keys.store</td><td style="color:var(--accent-soft)">$810.50</td><td>64</td><td>May 14, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>keystorm</td><td>storm@keys.gg</td><td style="color:var(--accent-soft)">$120.00</td><td>9</td><td>Apr 28, 2025</td><td><button class="action-btn view">View</button></td></tr>
+            <tr><td>alpharesell</td><td>alpha@resell.io</td><td style="color:var(--accent-soft)">$3,200.00</td><td>201</td><td>Jan 3, 2025</td><td><button class="action-btn view">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS ADMIN -->
+    <div id="admin-section-products-admin" class="hidden">
+      <div class="page-head"><h1>Products</h1><button class="btn-sm" onclick="openProductModal()">+ Add product</button></div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Variants</th><th>Images</th><th>Actions</th></tr></thead>
+          <tbody id="admin-products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCT MODAL -->
+    <div id="product-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+        <h2 style="font-size:16px;font-weight:600;margin-bottom:1rem" id="product-modal-title">Add Product</h2>
+        <input type="hidden" id="product-id">
+        <div class="field"><label>Product name</label><input class="s-input" id="product-name" style="width:100%"></div>
+        <div class="field"><label>Description</label><input class="s-input" id="product-desc" style="width:100%"></div>
+        <div class="field"><label>Price</label><input class="s-input" id="product-price" type="number" step="0.01" style="width:100%"></div>
+        <div class="field"><label>Category</label><input class="s-input" id="product-category" style="width:100%"></div>
+        
+        <div style="margin:1rem 0">
+          <label style="font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Images (one per line)</label>
+          <textarea class="s-input" id="product-images" style="width:100%;min-height:80px;font-family:'Inter',sans-serif;font-size:13px" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+        </div>
+        
+        <div style="margin:1rem 0">
+          <label style="font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Variants</label>
+          <div id="variants-container"></div>
+          <button class="btn-sm" onclick="addVariantField()" style="margin-top:8px">+ Add variant</button>
+        </div>
+        
+        <div style="display:flex;gap:8px;margin-top:1rem">
+          <button class="btn-sm" onclick="saveProduct()">Save product</button>
+          <button class="btn-sm" onclick="closeProductModal()" style="background:transparent;border:1px solid var(--border2)">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS ADMIN -->
+    <div id="admin-section-orders-admin" class="hidden">
+      <div class="page-head"><h1>All orders</h1><span class="admin-tag">234 total</span></div>
+      <div class="table-box">
+        <table class="data-table">
+          <thead><tr><th>Order ID</th><th>User</th><th>Product</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="mono">#ASX-4821</span></td><td>luxkeys</td><td>ASX VPN Pro</td><td style="color:var(--accent-soft)">$9.99</td><td>Jun 5, 2026</td><td><span class="pill active">Completed</span></td></tr>
+            <tr><td><span class="mono">#ASX-4820</span></td><td>voidshop</td><td>GameKeys Bundle</td><td style="color:var(--accent-soft)">$24.99</td><td>Jun 4, 2026</td><td><span class="pill active">Completed</span></td></tr>
+            <tr><td><span class="mono">#ASX-4819</span></td><td>alpharesell</td><td>StreamPass Ultra</td><td style="color:var(--accent-soft)">$14.99</td><td>Jun 3, 2026</td><td><span class="pill active">Completed</span></td></tr>
+            <tr><td><span class="mono">#ASX-4818</span></td><td>keystorm</td><td>CloudStore 1TB</td><td style="color:var(--accent-soft)">$4.99</td><td>Jun 2, 2026</td><td><span class="pill pending">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  <span id="toast-msg">Done</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SECURITY LAYER - CONSOLE PROTECTION & KEY OBFUSCATION
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  'use strict';
+  
+  // Anti-tampering: Check if script is running in expected context
+  const expectedDomain = window.location.hostname;
+  if (window.location.hostname !== expectedDomain && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    console.warn('Security warning: Unexpected domain');
+  }
+  
+  // Multi-layer debugger detection
+  const detectDebugger = () => {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+      document.body.innerHTML = '<h1 style="color:white;text-align:center;padding:50px;font-family:sans-serif">Security Alert: Debugger detected</h1>';
+      window.location.reload();
+    }
+  };
+  
+  // Console protection with filtering
+  const originalConsole = { ...console };
+  const sensitiveKeys = ['key', 'token', 'secret', 'password', 'api', 'credential'];
+  
+  Object.keys(console).forEach(method => {
+    console[method] = function(...args) {
+      try {
+        const str = args.join(' ').toLowerCase();
+        if (sensitiveKeys.some(key => str.includes(key))) {
+          return;
+        }
+        originalConsole[method].apply(console, args);
+      } catch(e) {
+        // Silent fail to prevent errors
+      }
+    };
+  });
+  
+  // Disable right-click and common shortcuts
+  document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    return false;
+  });
+  
+  document.addEventListener('keydown', e => {
+    // Block common dev tools shortcuts
+    if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'f' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+      e.preventDefault();
+      return false;
+    }
+    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+      e.preventDefault();
+      return false;
+    }
+  });
+  
+  // Detect dev tools via window size
+  const devToolsDetector = () => {
+    const threshold = 160;
+    const widthDiff = window.outerWidth - window.innerWidth > threshold;
+    const heightDiff = window.outerHeight - window.innerHeight > threshold;
+    
+    if (widthDiff || heightDiff) {
+      // Possible dev tools open - could add more sophisticated detection
+    }
+  };
+  
+  // Periodic security checks
+  setInterval(detectDebugger, 1000);
+  setInterval(devToolsDetector, 2000);
+  
+  // Clear sensitive data from memory on unload
+  window.addEventListener('beforeunload', () => {
+    sessionStorage.clear();
+    // Clear any sensitive variables
+    if (typeof KeyManager !== 'undefined') {
+      // KeyManager will handle its own cleanup
+    }
+  });
+  
+  // Prevent drag and drop of images/elements
+  document.addEventListener('dragstart', e => e.preventDefault());
+  document.addEventListener('drop', e => e.preventDefault());
+  
+  // Disable text selection on sensitive elements
+  const style = document.createElement('style');
+  style.textContent = `
+    .api-key-val {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// SECURE KEY MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+const KeyManager = (function() {
+  // Encrypted key storage (base64 + simple obfuscation)
+  const encryptedProdKey = 'YXN4X3Byb2RfazltWDJ2Ujh3UTRuTDdwSjNjRjZiSDF0WTVzRTBkQQ==';
+  const encryptedTestKey = 'YXN4X3Rlc3RfS2V5U2VjdXJlVGVzdDEyMzQ1Njc4OTA=';
+  
+  // Simple decryption (in production, use proper encryption)
+  const decrypt = (encoded) => {
+    try {
+      return atob(encoded);
+    } catch(e) {
+      return '';
+    }
+  };
+  
+  // Secure key reveal with timeout
+  let keyTimeout = null;
+  
+  return {
+    getProdKey: () => decrypt(encryptedProdKey),
+    getTestKey: () => decrypt(encryptedTestKey),
+    revealKey: (elementId, keyType) => {
+      const key = keyType === 'prod' ? KeyManager.getProdKey() : KeyManager.getTestKey();
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.textContent = key;
+        showToast('Key revealed — keep it private');
+        
+        // Auto-hide after 30 seconds
+        if (keyTimeout) clearTimeout(keyTimeout);
+        keyTimeout = setTimeout(() => {
+          el.textContent = keyType === 'prod' ? 'asx_prod_••••••••••••••••••••••••••••••' : 'asx_test_••••••••••••••••••••••••••••••';
+        }, 30000);
+      }
+    },
+    copyKey: (keyType) => {
+      const key = keyType === 'prod' ? KeyManager.getProdKey() : KeyManager.getTestKey();
+      navigator.clipboard.writeText(key).then(() => showToast('API key copied')).catch(() => showToast('Copy failed'));
+    }
+  };
+})();
+
+const DISCORD_WEBHOOK = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+const ADMIN_CREDS = { user: 'ASXKOSMYOWNER', pass: 'ASXOWNER67CHEATSKOSMY' };
+const DEMO_USERS = {
+  'demo':     { pass: 'demo123',  balance: 0.00, spent: 0.00,  orders: 0 },
+  'reseller': { pass: 'pass123',  balance: 0.00, spent: 0.00,  orders: 0 }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// BALANCE & TOP-UP SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const TOPUP_WEBHOOK = 'YOUR_TOPUP_WEBHOOK_URL_HERE'; // Discord webhook for top-up notifications
+const BALANCE_API_URL = 'http://localhost:3000/api'; // Balance API server URL
+
+// Load user balances from localStorage (fallback)
+function loadUserBalances() {
+  const stored = localStorage.getItem('asx_balances');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch(e) {
+      return {};
+    }
+  }
+  return {};
+}
+
+// Save user balances to localStorage (fallback)
+function saveUserBalances(balances) {
+  localStorage.setItem('asx_balances', JSON.stringify(balances));
+}
+
+// Get user balance from API or localStorage
+async function getUserBalance(username) {
+  try {
+    // Try API first
+    const response = await fetch(`${BALANCE_API_URL}/balance/${username}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.balance;
+    }
+  } catch(e) {
+    // Fallback to localStorage
+    console.log('API unavailable, using localStorage');
+  }
+  
+  const balances = loadUserBalances();
+  return balances[username] || 0;
+}
+
+// Update user balance (called by Discord bot via API)
+function updateUserBalance(username, amount) {
+  const balances = loadUserBalances();
+  balances[username] = (balances[username] || 0) + amount;
+  saveUserBalances(balances);
+  
+  // Update display if user is logged in
+  const currentSession = sessionStorage.getItem('asx_session');
+  if (currentSession) {
+    const session = JSON.parse(currentSession);
+    if (session.user === username) {
+      document.getElementById('stat-balance').textContent = '$' + balances[username].toFixed(2);
+    }
+  }
+  
+  return balances[username];
+}
+
+// Top up button - redirect to payment page
+function topUpBalance() {
+  window.open('https://asxcheats.mysellauth.com/product/top-up', '_blank');
+  showToast('Opening top-up page...');
+  
+  // Notify Discord that user requested top-up
+  const currentSession = sessionStorage.getItem('asx_session');
+  if (currentSession && TOPUP_WEBHOOK !== 'YOUR_TOPUP_WEBHOOK_URL_HERE') {
+    const session = JSON.parse(currentSession);
+    fetch(TOPUP_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '💰 Top-Up Request',
+          color: 0xB76EF0,
+          fields: [
+            { name: 'User', value: session.user, inline: true },
+            { name: 'Action', value: 'Opened top-up page', inline: true },
+            { name: 'Time', value: new Date().toLocaleString(), inline: true }
+          ],
+          footer: { text: 'ASX Software · Top-Up System' }
+        }]
+      })
+    }).catch(() => {}); // Silently fail if webhook not configured
+  }
+}
+
+// Check for balance updates (poll for bot updates)
+let balanceCheckInterval;
+let lastUpdateTimestamp = 0;
+
+async function startBalanceCheck() {
+  if (balanceCheckInterval) clearInterval(balanceCheckInterval);
+  
+  const currentSession = sessionStorage.getItem('asx_session');
+  if (!currentSession) return;
+  
+  const session = JSON.parse(currentSession);
+  const username = session.user;
+  
+  // Check every 5 seconds for balance updates
+  balanceCheckInterval = setInterval(async () => {
+    try {
+      // Check API for updates
+      const response = await fetch(`${BALANCE_API_URL}/balance/updates/${username}?since=${lastUpdateTimestamp}`);
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.updates && data.updates.length > 0) {
+          const latestUpdate = data.updates[data.updates.length - 1];
+          lastUpdateTimestamp = latestUpdate.timestamp;
+          
+          // Update display
+          const currentDisplay = document.getElementById('stat-balance').textContent;
+          const currentBalance = parseFloat(currentDisplay.replace('$', '')) || 0;
+          
+          if (latestUpdate.newBalance !== currentBalance) {
+            document.getElementById('stat-balance').textContent = '$' + latestUpdate.newBalance.toFixed(2);
+            const diff = latestUpdate.newBalance - currentBalance;
+            if (diff > 0) {
+              showToast(`💰 Balance increased by $${diff.toFixed(2)}!`);
+            } else if (diff < 0) {
+              showToast(`📉 Balance decreased by $${Math.abs(diff).toFixed(2)}`);
+            }
+          }
+        }
+      }
+    } catch(e) {
+      // Fallback to localStorage polling
+      const newBalance = getUserBalance(username);
+      const currentDisplay = document.getElementById('stat-balance').textContent;
+      const currentBalance = parseFloat(currentDisplay.replace('$', '')) || 0;
+      
+      if (newBalance !== currentBalance) {
+        document.getElementById('stat-balance').textContent = '$' + newBalance.toFixed(2);
+        if (newBalance > currentBalance) {
+          showToast(`Balance increased by $${(newBalance - currentBalance).toFixed(2)}!`);
+        }
+      }
+    }
+  }, 5000);
+}
+
+function stopBalanceCheck() {
+  if (balanceCheckInterval) {
+    clearInterval(balanceCheckInterval);
+    balanceCheckInterval = null;
+  }
+}
+
+// Restore session
+const stored = sessionStorage.getItem('asx_session');
+if (stored) {
+  const s = JSON.parse(stored);
+  if (s.isAdmin) initAdmin();
+  else initDashboard(s.user);
+}
+
+// ─── AUTH ───
+function showLogin()      { toggle('login-form','register-form','admin-login-form'); }
+function showRegister()   { toggle('register-form','login-form','admin-login-form'); }
+function showAdminLogin() { toggle('admin-login-form','login-form','register-form'); }
+function toggle(show, ...hide) {
+  document.getElementById(show).classList.remove('hidden');
+  hide.forEach(id => document.getElementById(id).classList.add('hidden'));
+}
+
+function handleLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const msg = document.getElementById('login-msg');
+  if (!u || !p) { msg.innerHTML = '<div class="msg error">Please fill in all fields.</div>'; return; }
+  if (DEMO_USERS[u] && DEMO_USERS[u].pass === p) {
+    msg.innerHTML = '';
+    sessionStorage.setItem('asx_session', JSON.stringify({ user: u, isAdmin: false }));
+    initDashboard(u);
+  } else {
+    msg.innerHTML = '<div class="msg error">Incorrect username or password.</div>';
+  }
+}
+
+function handleAdminLogin() {
+  const u = document.getElementById('admin-user').value.trim();
+  const p = document.getElementById('admin-pass').value;
+  const msg = document.getElementById('admin-login-msg');
+  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
+    sessionStorage.setItem('asx_session', JSON.stringify({ user: 'OWNER', isAdmin: true }));
+    initAdmin();
+  } else {
+    msg.innerHTML = '<div class="msg error">Invalid admin credentials.</div>';
+  }
+}
+
+async function handleRegister() {
+  const u = document.getElementById('reg-user').value.trim();
+  const e = document.getElementById('reg-email').value.trim();
+  const p = document.getElementById('reg-pass').value;
+  const d = document.getElementById('reg-discord').value.trim();
+  const msg = document.getElementById('reg-msg');
+  if (!u || !e || !p || !d) { msg.innerHTML = '<div class="msg error">All fields are required.</div>'; return; }
+
+  try {
+    await fetch(DISCORD_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: 'New reseller application',
+          color: 0xB76EF0,
+          fields: [
+            { name: 'Username', value: u, inline: true },
+            { name: 'Email',    value: e, inline: true },
+            { name: 'Discord',  value: d, inline: true },
+          ],
+          footer: { text: 'ASX Software · ' + new Date().toLocaleString() }
+        }]
+      })
+    });
+  } catch(err) { /* webhook not configured */ }
+
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('pending-page').classList.remove('hidden');
+}
+
+function logout() {
+  stopBalanceCheck(); // Stop balance checking
+  sessionStorage.removeItem('asx_session');
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('admin-page').classList.add('hidden');
+  document.getElementById('auth-page').classList.remove('hidden');
+  showLogin();
+}
+
+// ─── DASHBOARD ───
+async function initDashboard(username) {
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('pending-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.remove('hidden');
+
+  const d = DEMO_USERS[username] || { balance: 0, spent: 0, orders: 0 };
+  document.getElementById('sidebar-avatar').textContent = username.slice(0,2).toUpperCase();
+  document.getElementById('sidebar-username').textContent = username;
+  document.getElementById('welcome-msg').textContent = 'Welcome back, ' + username;
+  
+  // Use localStorage balance system (async)
+  const userBalance = await getUserBalance(username);
+  document.getElementById('stat-balance').textContent = '$' + userBalance.toFixed(2);
+  document.getElementById('stat-spent').textContent   = '$' + d.spent.toFixed(2);
+  document.getElementById('stat-orders').textContent  = d.orders;
+  document.getElementById('set-username').value = username;
+
+  updateDate();
+  renderTopProducts();
+  renderKeys();
+  renderOrders();
+  renderStore();
+  showSection('home');
+  
+  // Start balance check for bot updates
+  startBalanceCheck();
+}
+
+function updateDate() {
+  document.getElementById('welcome-date').textContent =
+    new Date().toLocaleDateString([], { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+const PRODS = [
+  { name:'ASX VPN Pro',     cat:'VPN',       price:'$9.99/mo', orders:8,  col:'#7c3aed' },
+  { name:'StreamPass Ultra',cat:'Streaming',  price:'$14.99/mo',orders:3,  col:'#c026d3' },
+  { name:'GameKeys Bundle', cat:'Gaming',     price:'$24.99',   orders:1,  col:'#9333ea' },
+];
+
+function iconSVG(i) {
+  const paths = [
+    'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
+    'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z',
+    'M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z',
+  ];
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="${paths[i%paths.length]}"/></svg>`;
+}
+
+function renderTopProducts() {
+  document.getElementById('top-products-grid').innerHTML = PRODS.map((p,i) => `
+    <div class="product-card">
+      <div class="prod-icon" style="background:${p.col}22;border:1px solid ${p.col}33">${iconSVG(i)}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-cat">${p.cat}</div>
+      <div class="prod-footer">
+        <div class="prod-price">${p.price}</div>
+        <div class="prod-orders">${p.orders} orders</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderKeys() {
+  const rows = [
+    { prod:'ASX VPN Pro',     key:'ASX-AAAA-BBBB-CCCC', exp:'Jul 1, 2026',  st:'active'  },
+    { prod:'StreamPass Ultra', key:'ASX-XXXX-YYYY-ZZZZ', exp:'Jun 15, 2026', st:'active'  },
+    { prod:'GameKeys Bundle',  key:'ASX-1234-5678-9ABC', exp:'Jan 1, 2026',  st:'expired' },
+  ];
+  document.getElementById('keys-tbody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.prod}</td>
+      <td><span class="mono">${r.key}</span></td>
+      <td>${r.exp}</td>
+      <td><span class="pill ${r.st}">${r.st.charAt(0).toUpperCase()+r.st.slice(1)}</span></td>
+    </tr>`).join('');
+}
+
+function renderOrders() {
+  const orders = [
+    { id:'#ASX-4821', prod:'ASX VPN Pro',     amt:'$9.99',  date:'Jun 5, 2026'  },
+    { id:'#ASX-4812', prod:'StreamPass Ultra', amt:'$14.99', date:'May 28, 2026' },
+    { id:'#ASX-4798', prod:'GameKeys Bundle',  amt:'$24.99', date:'May 20, 2026' },
+    { id:'#ASX-4777', prod:'ASX VPN Pro',      amt:'$9.99',  date:'May 5, 2026'  },
+    { id:'#ASX-4750', prod:'CloudStore 1TB',   amt:'$4.99',  date:'Apr 28, 2026' },
+  ];
+  document.getElementById('orders-list').innerHTML = orders.map(o => `
+    <div class="order-row">
+      <div class="order-id">${o.id}</div>
+      <div class="order-product">${o.prod}</div>
+      <div class="order-amt">${o.amt}</div>
+      <div class="order-date">${o.date}</div>
+    </div>`).join('');
+}
+
+const STORE_ITEMS = [
+  { name:'ASX VPN Pro',      price:'$9.99/mo',  desc:'Fast VPN across 50+ locations. Zero logs, kill switch, up to 10 devices.',         features:['50+ server locations','Zero-log policy','Kill switch','10 simultaneous devices'], col:'#7c3aed', i:0 },
+  { name:'StreamPass Ultra', price:'$14.99/mo', desc:'Access 20+ streaming platforms in 4K under one subscription.',                     features:['20+ platforms','4K HDR','Family plan','Offline downloads'], col:'#c026d3', i:1 },
+  { name:'GameKeys Bundle',  price:'$24.99',    desc:'5 premium game keys monthly across PC, Xbox, and PlayStation.',                    features:['5 keys / month','PC · Xbox · PS5','Exclusive titles','Instant delivery'], col:'#9333ea', i:2 },
+  { name:'CloudStore 1TB',   price:'$4.99/mo',  desc:'Encrypted cloud storage with end-to-end security and unlimited sharing.',          features:['1TB storage','E2E encrypted','Unlimited sharing','99.9% uptime'], col:'#a21caf', i:0 },
+];
+
+function renderStore() {
+  document.getElementById('store-grid').innerHTML = STORE_ITEMS.map(s => `
+    <div class="store-card">
+      <div class="store-head">
+        <div class="prod-icon" style="background:${s.col}22;border:1px solid ${s.col}33">${iconSVG(s.i)}</div>
+        <div class="store-name">${s.name}</div>
+      </div>
+      <div class="store-price">${s.price}</div>
+      <p class="store-desc">${s.desc}</p>
+      <ul class="store-features">
+        ${s.features.map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.75l6 6 9-13.5"/></svg>${f}</li>`).join('')}
+      </ul>
+      <button class="buy-btn" onclick="showToast('Added to cart')">Purchase</button>
+    </div>`).join('');
+}
+
+function showSection(id) {
+  ['home','keys','orders','products','settings','apikeys'].forEach(s => {
+    document.getElementById('section-'+s).classList.toggle('hidden', s!==id);
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick') === `showSection('${id}')`);
+  });
+}
+
+// ─── ADMIN ───
+function initAdmin() {
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('admin-page').classList.remove('hidden');
+  showAdminSection('overview');
+}
+
+function showAdminSection(id) {
+  ['overview','applications','users','products-admin','orders-admin'].forEach(s => {
+    document.getElementById('admin-section-'+s).classList.toggle('hidden', s!==id);
+  });
+  document.querySelectorAll('.admin-nav-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick') === `showAdminSection('${id}')`);
+  });
+}
+
+function approveApp(btn) {
+  const row = btn.closest('tr');
+  row.querySelector('td:nth-child(5)').innerHTML = '<span class="pill active">Approved</span>';
+  row.querySelector('td:last-child').innerHTML = '<button class="action-btn view">View</button>';
+  showToast('Application approved');
+}
+function rejectApp(btn) {
+  const row = btn.closest('tr');
+  row.querySelector('td:nth-child(5)').innerHTML = '<span class="pill expired">Rejected</span>';
+  row.querySelector('td:last-child').innerHTML = '<button class="action-btn view">View</button>';
+  showToast('Application rejected');
+}
+
+// ─── UTILS ───
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), 2800);
+}
+
+function revealKey() {
+  KeyManager.revealKey('prod-key-val', 'prod');
+}
+function copyKey() {
+  KeyManager.copyKey('prod');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRODUCT MANAGEMENT SYSTEM
+// ═══════════════════════════════════════════════════════════════
+let productsData = { products: [] };
+
+// Load products from localStorage
+function loadProducts() {
+  const stored = localStorage.getItem('asx_products');
+  if (stored) {
+    try {
+      productsData = JSON.parse(stored);
+    } catch(e) {
+      productsData = { products: [] };
+    }
+  }
+  renderAdminProducts();
+}
+
+// Save products to localStorage
+function saveProductsToStorage() {
+  localStorage.setItem('asx_products', JSON.stringify(productsData));
+}
+
+// Render products in admin panel
+function renderAdminProducts() {
+  const tbody = document.getElementById('admin-products-tbody');
+  if (!tbody) return;
+  
+  if (productsData.products.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:2rem">No products yet. Click "+ Add product" to create one.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = productsData.products.map(p => `
+    <tr>
+      <td>${p.name}</td>
+      <td>${p.category}</td>
+      <td style="color:var(--accent-soft)">$${p.price}</td>
+      <td>${p.variants ? p.variants.length : 0}</td>
+      <td>${p.image_urls ? p.image_urls.length : 0}</td>
+      <td class="flex-gap">
+        <button class="action-btn view" onclick="editProduct('${p.id}')">Edit</button>
+        <button class="action-btn reject" onclick="deleteProduct('${p.id}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Open product modal for adding
+function openProductModal() {
+  document.getElementById('product-modal').classList.remove('hidden');
+  document.getElementById('product-modal-title').textContent = 'Add Product';
+  document.getElementById('product-id').value = '';
+  document.getElementById('product-name').value = '';
+  document.getElementById('product-desc').value = '';
+  document.getElementById('product-price').value = '';
+  document.getElementById('product-category').value = '';
+  document.getElementById('product-images').value = '';
+  document.getElementById('variants-container').innerHTML = '';
+  addVariantField(); // Add one empty variant by default
+}
+
+// Open product modal for editing
+function editProduct(id) {
+  const product = productsData.products.find(p => p.id === id);
+  if (!product) return;
+  
+  document.getElementById('product-modal').classList.remove('hidden');
+  document.getElementById('product-modal-title').textContent = 'Edit Product';
+  document.getElementById('product-id').value = product.id;
+  document.getElementById('product-name').value = product.name;
+  document.getElementById('product-desc').value = product.description || '';
+  document.getElementById('product-price').value = product.price;
+  document.getElementById('product-category').value = product.category;
+  document.getElementById('product-images').value = (product.image_urls || []).join('\n');
+  
+  // Load variants
+  document.getElementById('variants-container').innerHTML = '';
+  if (product.variants && product.variants.length > 0) {
+    product.variants.forEach(v => addVariantField(v.name, v.price, v.stock, v.notes));
+  } else {
+    addVariantField();
+  }
+}
+
+// Close product modal
+function closeProductModal() {
+  document.getElementById('product-modal').classList.add('hidden');
+}
+
+// Add variant field
+function addVariantField(name = '', price = '', stock = '', notes = '') {
+  const container = document.getElementById('variants-container');
+  const variantId = Date.now();
+  const html = `
+    <div class="variant-field" data-variant-id="${variantId}" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input class="s-input" placeholder="Variant name (e.g., 1 Day Key)" value="${name}" style="flex:2" data-field="name">
+        <input class="s-input" placeholder="Price" type="number" step="0.01" value="${price}" style="flex:1" data-field="price">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input class="s-input" placeholder="Stock (-1 for unlimited)" type="number" value="${stock}" style="flex:1" data-field="stock">
+        <input class="s-input" placeholder="Notes (optional)" value="${notes}" style="flex:2" data-field="notes">
+      </div>
+      <button class="btn-sm" onclick="removeVariantField(${variantId})" style="background:rgba(248,113,113,0.1);color:#f87171;border-color:rgba(248,113,113,0.2)">Remove variant</button>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', html);
+}
+
+// Remove variant field
+function removeVariantField(id) {
+  const field = document.querySelector(`.variant-field[data-variant-id="${id}"]`);
+  if (field) field.remove();
+}
+
+// Save product
+function saveProduct() {
+  const id = document.getElementById('product-id').value;
+  const name = document.getElementById('product-name').value.trim();
+  const description = document.getElementById('product-desc').value.trim();
+  const price = parseFloat(document.getElementById('product-price').value);
+  const category = document.getElementById('product-category').value.trim();
+  const imagesText = document.getElementById('product-images').value.trim();
+  
+  if (!name || !price || !category) {
+    showToast('Please fill in name, price, and category');
+    return;
+  }
+  
+  const imageUrls = imagesText ? imagesText.split('\n').map(url => url.trim()).filter(url => url) : [];
+  
+  // Collect variants
+  const variants = [];
+  document.querySelectorAll('.variant-field').forEach(field => {
+    const vName = field.querySelector('[data-field="name"]').value.trim();
+    const vPrice = parseFloat(field.querySelector('[data-field="price"]').value) || 0;
+    const vStock = parseInt(field.querySelector('[data-field="stock"]').value) || -1;
+    const vNotes = field.querySelector('[data-field="notes"]').value.trim();
+    
+    if (vName) {
+      variants.push({
+        name: vName,
+        price: vPrice,
+        stock: vStock,
+        notes: vNotes || null
+      });
+    }
+  });
+  
+  const product = {
+    id: id || 'prod_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    name,
+    description,
+    price,
+    category,
+    currency: 'USD',
+    image_urls: imageUrls,
+    image_url: imageUrls.length > 0 ? imageUrls[0] : null,
+    variants,
+    visibility: 'visible',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  if (id) {
+    // Update existing
+    const index = productsData.products.findIndex(p => p.id === id);
+    if (index !== -1) {
+      product.created_at = productsData.products[index].created_at;
+      productsData.products[index] = product;
+    }
+  } else {
+    // Add new
+    productsData.products.push(product);
+  }
+  
+  saveProductsToStorage();
+  renderAdminProducts();
+  closeProductModal();
+  showToast(id ? 'Product updated' : 'Product added');
+}
+
+// Delete product
+function deleteProduct(id) {
+  if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
+  
+  productsData.products = productsData.products.filter(p => p.id !== id);
+  saveProductsToStorage();
+  renderAdminProducts();
+  showToast('Product deleted');
+}
+
+// Initialize products on admin load
+const originalInitAdmin = initAdmin;
+initAdmin = function() {
+  originalInitAdmin();
+  loadProducts();
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const lf = document.getElementById('login-form');
+  const rf = document.getElementById('register-form');
+  const af = document.getElementById('admin-login-form');
+  if (!lf.classList.contains('hidden'))       handleLogin();
+  else if (!rf.classList.contains('hidden'))  handleRegister();
+  else if (!af.classList.contains('hidden'))  handleAdminLogin();
+});
+</script>
+</body>
+</html>
